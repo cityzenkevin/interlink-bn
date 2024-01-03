@@ -12,12 +12,38 @@ export class StudentService {
       where: filter,
       include: {
         user: true,
+        education: true,
+        experience: true,
+        certificates: true,
+        applications: {
+          include: {
+            internship: true,
+          },
+        },
       },
     });
     return students;
   }
-  async updateStudent() {}
-  async deleteStudent() {}
+
+  async updateStudent(data: Prisma.StudentUpdateInput, studentId: number) {
+    const student = await this.prisma.student.update({
+      where: {
+        id: studentId,
+      },
+      data,
+    });
+    return student;
+  }
+
+  async deleteStudent(id: number) {
+    const student = await this.prisma.student.delete({
+      where: {
+        id,
+      },
+    });
+
+    return student;
+  }
 
   async getInternships(filters?: Prisma.InternshipWhereInput) {
     const internships = await this.prisma.internship.findMany({
@@ -27,5 +53,52 @@ export class StudentService {
       },
     });
     return internships;
+  }
+
+  async createEducation(data: Prisma.EducationCreateInput) {
+    try {
+      const education = await this.prisma.education.create({
+        data,
+      });
+      return education;
+    } catch (error: any) {
+      console.log(error);
+      throw new Error('Problem creating education');
+    }
+  }
+
+  async getEducation(filter?: Prisma.EducationWhereInput) {
+    const education = await this.prisma.education.findMany({
+      where: filter,
+    });
+    return education;
+  }
+
+  async getExperience(filter?: Prisma.ExperienceWhereInput) {
+    const experience = await this.prisma.experience.findMany({
+      where: filter,
+    });
+    return experience;
+  }
+
+  async getCertificate(filter?: Prisma.CertificateWhereInput) {
+    const certificate = await this.prisma.certificate.findMany({
+      where: filter,
+    });
+    return certificate;
+  }
+
+  async createExperience(data: Prisma.ExperienceCreateInput) {
+    const experience = await this.prisma.experience.create({
+      data,
+    });
+    return experience;
+  }
+
+  async createCertificate(data: Prisma.CertificateCreateInput) {
+    const certificate = await this.prisma.certificate.create({
+      data,
+    });
+    return certificate;
   }
 }
